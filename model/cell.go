@@ -1,11 +1,10 @@
 package model
 
-type CellStatus int
+type CellStatus bool
 
 const (
-	CELL_DIE    CellStatus = 0
-	CELL_LIVE   CellStatus = 1
-	CELL_UNKNOW CellStatus = 2
+	CELL_DIE  CellStatus = false
+	CELL_LIVE CellStatus = true
 )
 
 type Coordinate struct {
@@ -15,7 +14,7 @@ type Coordinate struct {
 
 type Cell struct {
 	Coordinate
-	Status     CellStatus `json:"status"`
+	Status     CellStatus `json:"is_live"`
 	nextStatus CellStatus
 	neighbors  []*Cell
 }
@@ -24,11 +23,14 @@ func (c *Cell) CheckLife() {
 	liveNeighbors := 0
 
 	for _, v := range c.neighbors {
+		if v == nil {
+			continue
+		}
 		if v.Status == CELL_LIVE {
 			liveNeighbors++
 		}
 
-		if liveNeighbors >= 4  {
+		if liveNeighbors >= 4 {
 			// if more than 4, no need to check
 			break
 		}
@@ -51,18 +53,14 @@ func (c *Cell) CheckLife() {
 			c.nextStatus = CELL_LIVE
 		}
 	}
-
-	c.Status = CELL_UNKNOW
 }
 
 func (c *Cell) SetNeighbors(neighbors []*Cell) {
 	c.neighbors = neighbors
 }
 
-func (c Cell) Refresh() {
-	if c.Status == CELL_UNKNOW {
-		c.Status = c.nextStatus
-	}
+func (c *Cell) Refresh() {
+	c.Status = c.nextStatus
 }
 
 func NewCell(x, y int, status CellStatus) (cell *Cell) {

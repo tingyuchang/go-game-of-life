@@ -1,7 +1,11 @@
 package model
 
+import "fmt"
+
 type Controller struct {
-	Cells []*Cell
+	Cells   []*Cell
+	Size    int
+	Version int
 }
 
 func NewController(size int) *Controller {
@@ -58,10 +62,10 @@ func NewController(size int) *Controller {
 		cell.SetNeighbors(neighbors)
 	}
 
-	return &Controller{Cells: cells}
+	return &Controller{Cells: cells, Size: size}
 }
 
-func (c *Controller)Run() {
+func (c *Controller) Run() {
 	// check next step status
 	for _, v := range c.Cells {
 		v.CheckLife()
@@ -70,4 +74,24 @@ func (c *Controller)Run() {
 	for _, v := range c.Cells {
 		v.Refresh()
 	}
+	c.Version++
+}
+
+func (c *Controller) Show() {
+	fmt.Printf("Step: %v\n", c.Version)
+	for i, v := range c.Cells {
+		if v.Status {
+			fmt.Printf(Yellow("O, "))
+		} else {
+			fmt.Printf("X, ")
+		}
+		if (i % c.Size) == 9 {
+			fmt.Println()
+		}
+	}
+}
+
+// Reverse reverses' cell's status
+func (c *Controller) Reverse(position int) {
+	c.Cells[position].Status = !c.Cells[position].Status
 }
