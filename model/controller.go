@@ -38,7 +38,7 @@ func (c *Controller) Show() {
 		} else {
 			fmt.Printf("X, ")
 		}
-		if (i % c.Size) == 9 {
+		if (i % c.Size) == c.Size-1 {
 			fmt.Println()
 		}
 	}
@@ -66,15 +66,21 @@ func (c *Controller) Start(ctx context.Context) {
 
 // Stop use context cancel func to stop infinite loop
 func (c *Controller) Stop() {
-	c.cancel()
+	if c.cancel != nil {
+		c.cancel()
+	}
 }
 
-// Next likes Run(), but if controller is running Start()
+// Next likes Run(), but if controller is running
 // should stop current loop and run new loop after Run()
 func (c *Controller) Next() {
-	c.Stop()
-	c.Run()
-	c.Start(context.Background())
+	if c.cancel != nil {
+		c.Stop()
+		c.Run()
+		c.Start(context.Background())
+	} else {
+		c.Run()
+	}
 }
 
 // NewController create a controller which initialize size*size cells
@@ -84,7 +90,7 @@ func NewController(size int) *Controller {
 	// setup environment
 	for i := 0; i < size; i++ {
 		for j := 0; j < size; j++ {
-			cell := NewCell(i, j, CELL_DIE)
+			cell := NewCell(i, j, i*size+j, CELL_DIE)
 			cells[i*size+j] = cell
 		}
 	}
@@ -159,7 +165,9 @@ func GetStartWithGlider(size int) *Controller {
 }
 
 func ResetController(c *Controller) *Controller {
+	if c.cancel != nil {
+		c.Stop()
+	}
 	reset := NewController(c.Size)
-	c = nil
 	return reset
 }

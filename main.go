@@ -1,25 +1,29 @@
 package main
 
 import (
-	"context"
+	"gameoflife/api"
 	"gameoflife/model"
 	"net/http"
-	"time"
 )
 
-var size = 10
+var (
+	size = 20 // could be input variable
+)
 
 func main() {
-	c := model.GetStartWithGlider(size)
-	go c.Start(context.Background())
+	model.CurrentController = model.GetStartWithGlider(size)
 
-	go func() {
-		time.Sleep(10 * time.Second)
-		c.Stop()
-	}()
+	http.Handle("/", http.HandlerFunc(api.IndexHandler))
+	http.Handle("/ws", http.HandlerFunc(api.WsUpgradeHandler))
+	http.Handle("/start", http.HandlerFunc(api.StartHandler))
+	http.Handle("/stop", http.HandlerFunc(api.StopHandler))
+	http.Handle("/reverse", http.HandlerFunc(api.ReverseHandler))
+	http.Handle("/next", http.HandlerFunc(api.NextHandler))
+	http.Handle("/reset", http.HandlerFunc(api.ResetHandler))
 
-	err := http.ListenAndServe(":8080", nil)
+	err := http.ListenAndServe(":8081", nil)
 	if err != nil {
 		panic(err)
 	}
 }
+

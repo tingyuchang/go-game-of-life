@@ -17,6 +17,7 @@ type Cell struct {
 	Status     CellStatus `json:"is_live"`
 	nextStatus CellStatus
 	neighbors  []*Cell
+	Id         int `json:"id"`
 }
 
 // CheckLife implements the rule of Conway's Game of Life, please check  https://en.wikipedia.org/wiki/Conway's_Game_of_Life
@@ -68,6 +69,6 @@ func (c *Cell) SetNeighbors(neighbors []*Cell) {
 }
 
 // NewCell initialize a new cell with coordinator x, y and cell status
-func NewCell(x, y int, status CellStatus) (cell *Cell) {
-	return &Cell{Status: status, Coordinate: Coordinate{X: x, Y: y}}
+func NewCell(x, y, id int, status CellStatus) (cell *Cell) {
+	return &Cell{Status: status, Coordinate: Coordinate{X: x, Y: y}, Id: id}
 }

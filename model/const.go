@@ -13,6 +13,8 @@ var (
 	White   = Color("\033[1;37m%s\033[0m")
 )
 
+var CurrentController *Controller
+
 func Color(colorString string) func(...interface{}) string {
 	sprint := func(args ...interface{}) string {
 		return fmt.Sprintf(colorString,
