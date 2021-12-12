@@ -8,8 +8,8 @@ const (
 )
 
 type Coordinate struct {
-	X int
-	Y int
+	X int `json:"x"`
+	Y int `json:"y"`
 }
 
 type Cell struct {
@@ -19,6 +19,8 @@ type Cell struct {
 	neighbors  []*Cell
 }
 
+// CheckLife implements the rule of Conway's Game of Life, please check  https://en.wikipedia.org/wiki/Conway's_Game_of_Life
+// each cell store neighbor's pointer, we use these pointers to check cell's life in next step.
 func (c *Cell) CheckLife() {
 	liveNeighbors := 0
 
@@ -55,14 +57,16 @@ func (c *Cell) CheckLife() {
 	}
 }
 
+// NextStep updates cell status to next step.
+func (c *Cell) NextStep() {
+	c.Status = c.nextStatus
+}
+// SetNeighbors is a setter for cell.neighbors.
 func (c *Cell) SetNeighbors(neighbors []*Cell) {
 	c.neighbors = neighbors
 }
 
-func (c *Cell) Refresh() {
-	c.Status = c.nextStatus
-}
-
+// NewCell initialize a new cell with coordinator x, y and cell status
 func NewCell(x, y int, status CellStatus) (cell *Cell) {
 	return &Cell{Status: status, Coordinate: Coordinate{X: x, Y: y}}
 }

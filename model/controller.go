@@ -8,6 +8,8 @@ type Controller struct {
 	Version int
 }
 
+// NewController create a controller which initialize size*size cells
+// and setup cell's neighbors.
 func NewController(size int) *Controller {
 	cells := make([]*Cell, size*size)
 	// setup environment
@@ -65,6 +67,8 @@ func NewController(size int) *Controller {
 	return &Controller{Cells: cells, Size: size}
 }
 
+// Run execute cell.CheckLife() for all cells
+// and then refresh it.
 func (c *Controller) Run() {
 	// check next step status
 	for _, v := range c.Cells {
@@ -72,11 +76,13 @@ func (c *Controller) Run() {
 	}
 
 	for _, v := range c.Cells {
-		v.Refresh()
+		v.NextStep()
 	}
 	c.Version++
 }
 
+// Show is a test method, which prints status for all cells
+// it could check Run()'s result.
 func (c *Controller) Show() {
 	fmt.Printf("Step: %v\n", c.Version)
 	for i, v := range c.Cells {
@@ -91,7 +97,7 @@ func (c *Controller) Show() {
 	}
 }
 
-// Reverse reverses' cell's status
+// Reverse reverse cell's status
 func (c *Controller) Reverse(position int) {
 	c.Cells[position].Status = !c.Cells[position].Status
 }
