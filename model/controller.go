@@ -1,11 +1,80 @@
 package model
 
-import "fmt"
+import (
+	"context"
+	"fmt"
+	"time"
+)
 
 type Controller struct {
 	Cells   []*Cell
 	Size    int
 	Version int
+	ctx     context.Context
+	cancel  context.CancelFunc
+}
+
+// Run execute cell.CheckLife() for all cells
+// and then refresh it.
+func (c *Controller) Run() {
+	// check next step status
+	for _, v := range c.Cells {
+		v.CheckLife()
+	}
+
+	for _, v := range c.Cells {
+		v.NextStep()
+	}
+	c.Version++
+}
+
+// Show is a test method, which prints status for all cells
+// it could check Run()'s result.
+func (c *Controller) Show() {
+	fmt.Printf("Step: %v\n", c.Version)
+	for i, v := range c.Cells {
+		if v.Status {
+			fmt.Printf(Yellow("O, "))
+		} else {
+			fmt.Printf("X, ")
+		}
+		if (i % c.Size) == 9 {
+			fmt.Println()
+		}
+	}
+}
+
+// Reverse reverse cell's status
+func (c *Controller) Reverse(position int) {
+	c.Cells[position].Status = !c.Cells[position].Status
+}
+
+// Start starts infinite loop to run c.Run() per second
+func (c *Controller) Start(ctx context.Context) {
+	c.ctx, c.cancel = context.WithCancel(ctx)
+	for {
+		c.Run()
+		c.Show()
+		time.Sleep(1 * time.Second)
+		select {
+		case <-c.ctx.Done():
+			return
+		default:
+		}
+	}
+}
+
+// Stop use context cancel func to stop infinite loop
+func (c *Controller) Stop() {
+	c.cancel()
+}
+
+// Next likes Run(), but if controller is running Start()
+// should stop current loop and run new loop after Run()
+func (c *Controller) Next() {
+	c.Stop()
+	c.Run()
+	c.Start(context.Background())
 }
 
 // NewController create a controller which initialize size*size cells
@@ -67,37 +136,30 @@ func NewController(size int) *Controller {
 	return &Controller{Cells: cells, Size: size}
 }
 
-// Run execute cell.CheckLife() for all cells
-// and then refresh it.
-func (c *Controller) Run() {
-	// check next step status
-	for _, v := range c.Cells {
-		v.CheckLife()
+// GetStartWithGlider initialize graph like glider on the center
+// ex:
+//	X O X
+//	X X O
+//	O O O
+//
+func GetStartWithGlider(size int) *Controller {
+	controller := NewController(size)
+	if size < 10 {
+		return controller
 	}
 
-	for _, v := range c.Cells {
-		v.NextStep()
-	}
-	c.Version++
+	center := (size/2-1)*size + (size/2 - 1)
+	controller.Reverse(center - size)
+	controller.Reverse(center + 1)
+	controller.Reverse(center + size - 1)
+	controller.Reverse(center + size)
+	controller.Reverse(center + size + 1)
+
+	return controller
 }
 
-// Show is a test method, which prints status for all cells
-// it could check Run()'s result.
-func (c *Controller) Show() {
-	fmt.Printf("Step: %v\n", c.Version)
-	for i, v := range c.Cells {
-		if v.Status {
-			fmt.Printf(Yellow("O, "))
-		} else {
-			fmt.Printf("X, ")
-		}
-		if (i % c.Size) == 9 {
-			fmt.Println()
-		}
-	}
-}
-
-// Reverse reverse cell's status
-func (c *Controller) Reverse(position int) {
-	c.Cells[position].Status = !c.Cells[position].Status
+func ResetController(c *Controller) *Controller {
+	reset := NewController(c.Size)
+	c = nil
+	return reset
 }

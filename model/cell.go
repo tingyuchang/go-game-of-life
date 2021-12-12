@@ -61,6 +61,7 @@ func (c *Cell) CheckLife() {
 func (c *Cell) NextStep() {
 	c.Status = c.nextStatus
 }
+
 // SetNeighbors is a setter for cell.neighbors.
 func (c *Cell) SetNeighbors(neighbors []*Cell) {
 	c.neighbors = neighbors

@@ -1,31 +1,25 @@
 package main
 
 import (
+	"context"
 	"gameoflife/model"
+	"net/http"
+	"time"
 )
 
 var size = 10
 
 func main() {
-	c := model.NewController(size)
-	c.Show()
-	c.Reverse(0)
-	c.Reverse(1)
-	c.Reverse(10)
-	c.Reverse(11)
-	c.Reverse(22)
-	c.Reverse(23)
-	c.Reverse(32)
-	c.Reverse(33)
-	c.Show()
-	c.Run()
-	c.Show()
-	c.Run()
-	c.Show()
-	c.Run()
-	c.Show()
-	c.Run()
-	c.Show()
-	c.Run()
-	c.Show()
+	c := model.GetStartWithGlider(size)
+	go c.Start(context.Background())
+
+	go func() {
+		time.Sleep(10 * time.Second)
+		c.Stop()
+	}()
+
+	err := http.ListenAndServe(":8080", nil)
+	if err != nil {
+		panic(err)
+	}
 }
