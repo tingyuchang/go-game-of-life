@@ -51,6 +51,9 @@ func (c *Controller) Reverse(position int) {
 
 // Start starts infinite loop to run c.Run() per second
 func (c *Controller) Start(ctx context.Context) {
+	if c.cancel != nil {
+		return
+	}
 	c.ctx, c.cancel = context.WithCancel(ctx)
 	for {
 		c.Run()
