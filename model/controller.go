@@ -59,7 +59,6 @@ func (c *Controller) Start(ctx context.Context) {
 	c.IsStart = true
 	for {
 		c.Run()
-		c.Show()
 		time.Sleep(1 * time.Second)
 		select {
 		case <-c.ctx.Done():
@@ -90,9 +89,51 @@ func (c *Controller) Next() {
 	}
 }
 
+// Reset is reset cells to default, and version to 0
+func (c *Controller) Reset() {
+	if c.IsStart {
+		c.Stop()
+	}
+
+	c.Cells = initCells(c.Size)
+	c.Version = 0
+	c.IsStart = false
+}
+
 // NewController create a controller which initialize size*size cells
 // and setup cell's neighbors.
 func NewController(size int) *Controller {
+	cells := initCells(size)
+	return &Controller{Cells: cells, Size: size}
+}
+
+// GetStartWithGlider initialize graph like glider on the center
+// ex:
+//	X O X
+//	X X O
+//	O O O
+//
+func GetStartWithGlider(size int) *Controller {
+	controller := NewController(size)
+	if size < 10 {
+		return controller
+	}
+
+	center := (size/2-1)*size + (size/2 - 1)
+	controller.Reverse(center - size)
+	controller.Reverse(center + 1)
+	controller.Reverse(center + size - 1)
+	controller.Reverse(center + size)
+	controller.Reverse(center + size + 1)
+
+	return controller
+}
+
+func Init(size int) {
+	CurrentController = GetStartWithGlider(size)
+}
+
+func initCells(size int) []*Cell {
 	cells := make([]*Cell, size*size)
 	// setup environment
 	for i := 0; i < size; i++ {
@@ -145,36 +186,5 @@ func NewController(size int) *Controller {
 
 		cell.SetNeighbors(neighbors)
 	}
-
-	return &Controller{Cells: cells, Size: size}
-}
-
-// GetStartWithGlider initialize graph like glider on the center
-// ex:
-//	X O X
-//	X X O
-//	O O O
-//
-func GetStartWithGlider(size int) *Controller {
-	controller := NewController(size)
-	if size < 10 {
-		return controller
-	}
-
-	center := (size/2-1)*size + (size/2 - 1)
-	controller.Reverse(center - size)
-	controller.Reverse(center + 1)
-	controller.Reverse(center + size - 1)
-	controller.Reverse(center + size)
-	controller.Reverse(center + size + 1)
-
-	return controller
-}
-
-func ResetController(c *Controller) *Controller {
-	if c.IsStart {
-		c.Stop()
-	}
-	reset := NewController(c.Size)
-	return reset
+	return cells
 }

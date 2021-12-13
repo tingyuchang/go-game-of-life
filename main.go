@@ -10,10 +10,17 @@ import (
 var size = 20 // could be input variable
 
 func main() {
-	model.CurrentController = model.GetStartWithGlider(size)
 	websocket.Init()
+	model.Init(size)
 	go websocket.CurrentHub.Run()
+	initAPI()
+	err := http.ListenAndServe(":8081", nil)
+	if err != nil {
+		panic(err)
+	}
+}
 
+func initAPI() {
 	http.Handle("/", http.HandlerFunc(api.IndexHandler))
 	http.Handle("/ws", http.HandlerFunc(api.WsUpgradeHandler))
 	http.Handle("/start", http.HandlerFunc(api.StartHandler))
@@ -21,9 +28,4 @@ func main() {
 	http.Handle("/reverse", http.HandlerFunc(api.ReverseHandler))
 	http.Handle("/next", http.HandlerFunc(api.NextHandler))
 	http.Handle("/reset", http.HandlerFunc(api.ResetHandler))
-
-	err := http.ListenAndServe(":8081", nil)
-	if err != nil {
-		panic(err)
-	}
 }

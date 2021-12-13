@@ -51,3 +51,8 @@ func (h *Hub) Run() {
 		}
 	}
 }
+
+func (h *Hub) Broadcast(msg []byte)  {
+	serverMessage := Message{Sender: nil, Msg: msg}
+	h.broadcast <- serverMessage
+}

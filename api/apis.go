@@ -102,7 +102,7 @@ func ResetHandler(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Access-Control-Allow-Methods", "*")
 		w.Header().Add("Access-Control-Allow-Headers", "Origin, Methods, Content-Type, Authorization")
 		w.Header().Add("Access-Control-Allow-Credentials", "true")
-		model.CurrentController = model.ResetController(model.CurrentController)
+		model.CurrentController.Reset()
 		data, _ := json.Marshal(response{Success: true})
 		_, _ = w.Write(data)
 	} else {
