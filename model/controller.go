@@ -142,10 +142,13 @@ func GetStartWithGlider(size int) *Controller {
 	return controller
 }
 
+// Init create controller with default shape
+// size is the cells count (equal size*size)
 func Init(size int) {
 	CurrentController = GetStartWithGlider(size)
 }
 
+// initCells create a new cells (all die)
 func initCells(size int) []*Cell {
 	cells := make([]*Cell, size*size)
 	// setup environment

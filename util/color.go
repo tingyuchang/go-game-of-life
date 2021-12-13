@@ -6,8 +6,11 @@ import (
 	"strconv"
 )
 
-// GetAverageColor
-// #000000
+// GetAverageColor we use hex color to share (e.g. #FFFFFF)
+// this function will sum all RGB values in colors
+// and return the average value of sum.
+// for convenience, it will convert hex to rgb color(float)
+// calculate the avg and convert to hex string to return.
 func GetAverageColor(colors []string) string {
 	colorNum := 0
 	rgbColors := make([]color.RGBA, len(colors))
@@ -33,6 +36,7 @@ func GetAverageColor(colors []string) string {
 	return fmt.Sprintf("#%v%v%v", floatToHex(r), floatToHex(g), floatToHex(b))
 }
 
+// parseHexColor convert hex color to rgb color
 func parseHexColor(s string) (c color.RGBA, err error) {
 	c.A = 0xff
 	switch len(s) {
@@ -51,6 +55,7 @@ func parseHexColor(s string) (c color.RGBA, err error) {
 	return
 }
 
+// floatToHex convert rgb color to hex
 func floatToHex(f float64) string {
 	result := strconv.FormatInt(int64(f), 16)
 	if len(result) == 1 {

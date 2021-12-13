@@ -11,19 +11,10 @@ type Hub struct {
 	unRegister chan *WSClient
 }
 
-func NewHub() *Hub {
-	return &Hub{
-		clients:    make(map[*WSClient]bool),
-		broadcast:  make(chan Message),
-		register:   make(chan *WSClient),
-		unRegister: make(chan *WSClient),
-	}
-}
-
-func Init() {
-	CurrentHub = NewHub()
-}
-
+// Run is running a for-loop to receive hub's channels
+// register will store connecting client
+// unregister will remove disconnecting client
+// broadcast is response for broadcasting message to all registered clients
 func (h *Hub) Run() {
 	for {
 		select {
@@ -52,7 +43,24 @@ func (h *Hub) Run() {
 	}
 }
 
+// BroadcastMsg prepare a defined Message format
+// Sender is nil means this message is sent by System
 func (h *Hub) BroadcastMsg(msg []byte) {
 	serverMessage := Message{Sender: nil, Msg: msg}
 	h.broadcast <- serverMessage
 }
+
+// NewHub create a new hub
+func NewHub() *Hub {
+	return &Hub{
+		clients:    make(map[*WSClient]bool),
+		broadcast:  make(chan Message),
+		register:   make(chan *WSClient),
+		unRegister: make(chan *WSClient),
+	}
+}
+// Init initial currentHub
+func Init() {
+	CurrentHub = NewHub()
+}
+

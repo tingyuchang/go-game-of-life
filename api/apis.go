@@ -8,8 +8,14 @@ import (
 	"net/http"
 )
 
+// using go-gin (web framework) is more convenient
+// TODO: change api to go-gin
+
+// IndexHandler returns all cells and controller's status
+// TODO: is need always return all cells or only updated cells?
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
+		// to resolve CORS issue when local testing
 		w.Header().Add("Content-Type", "application/json")
 		w.Header().Add("Access-Control-Allow-Origin", "*")
 		w.Header().Add("Access-Control-Allow-Methods", "*")
@@ -26,12 +32,15 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// WsUpgradeHandler handles websocket upgrade
 func WsUpgradeHandler(w http.ResponseWriter, r *http.Request) {
 	websocket.ServeWS(w, r, websocket.CurrentHub)
 }
 
+// StartHandler runs cell controller's Start(), which runs each steps automatically
 func StartHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
+		// to resolve CORS issue when local testing
 		w.Header().Add("Content-Type", "application/json")
 		w.Header().Add("Access-Control-Allow-Origin", "*")
 		w.Header().Add("Access-Control-Allow-Methods", "*")
@@ -45,8 +54,10 @@ func StartHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// StopHandler stops cell controller's automation
 func StopHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
+		// to resolve CORS issue when local testing
 		w.Header().Add("Content-Type", "application/json")
 		w.Header().Add("Access-Control-Allow-Origin", "*")
 		w.Header().Add("Access-Control-Allow-Methods", "*")
@@ -60,8 +71,11 @@ func StopHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// ReverseHandler makes cell from live to die and vice
+// it receives color from client, and assign to reversed cell
 func ReverseHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
+		// to resolve CORS issue when local testing
 		w.Header().Add("Content-Type", "application/json")
 		w.Header().Add("Access-Control-Allow-Origin", "*")
 		w.Header().Add("Access-Control-Allow-Methods", "*")
@@ -80,8 +94,10 @@ func ReverseHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// NextHandler executes cell controller's Next()
 func NextHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
+		// to resolve CORS issue when local testing
 		w.Header().Add("Content-Type", "application/json")
 		w.Header().Add("Access-Control-Allow-Origin", "*")
 		w.Header().Add("Access-Control-Allow-Methods", "*")
@@ -95,8 +111,10 @@ func NextHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// ResetHandler executes cell controller's Reset()
 func ResetHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
+		// to resolve CORS issue when local testing
 		w.Header().Add("Content-Type", "application/json")
 		w.Header().Add("Access-Control-Allow-Origin", "*")
 		w.Header().Add("Access-Control-Allow-Methods", "*")
@@ -110,8 +128,10 @@ func ResetHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// GetColorHandler returns a random color to client
 func GetColorHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
+		// to resolve CORS issue when local testing
 		w.Header().Add("Content-Type", "application/json")
 		w.Header().Add("Access-Control-Allow-Origin", "*")
 		w.Header().Add("Access-Control-Allow-Methods", "*")

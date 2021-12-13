@@ -1,7 +1,6 @@
 package websocket
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -9,6 +8,7 @@ import (
 	ws "github.com/gorilla/websocket"
 )
 
+// WSClient is the connected client
 type WSClient struct {
 	hub  *Hub
 	conn *ws.Conn
@@ -40,11 +40,6 @@ func (c *WSClient) read() {
 
 	c.conn.SetReadLimit(maxMessageSize)
 	_ = c.conn.SetReadDeadline(time.Now().Add(pongWait))
-	c.conn.SetPongHandler(func(appData string) error {
-		// when received ping msg, reset read deadline
-		_ = c.conn.SetReadDeadline(time.Now().Add(pongWait))
-		return nil
-	})
 
 	for {
 		_, message, err := c.conn.ReadMessage()
@@ -55,11 +50,11 @@ func (c *WSClient) read() {
 			}
 			break
 		}
-		if msg := string(message[:]); msg == "hi" {
-			fmt.Println(msg)
+		if msg := string(message[:]); msg == "ping" {
+			_ = c.conn.SetReadDeadline(time.Now().Add(pongWait))
 			continue
 		}
-		// no need to share message from peer to peer
+		// no need to share message from peer to peer in current scope
 		// clientMsg := Message{Sender: c, Msg: message}
 		// c.hub.broadcast <- clientMsg
 	}
@@ -73,6 +68,7 @@ func (c *WSClient) write() {
 		select {
 		case message, ok := <-c.send:
 			if !ok {
+				log.Printf("client's send is closed")
 			}
 			w, err := c.conn.NextWriter(ws.TextMessage)
 			if err != nil {
@@ -97,6 +93,7 @@ func (c *WSClient) write() {
 	}
 }
 
+// ServeWS handle upgrade http connection to websocket
 func ServeWS(w http.ResponseWriter, r *http.Request, h *Hub) {
 	conn, err := updrader.Upgrade(w, r, nil)
 	if err != nil {

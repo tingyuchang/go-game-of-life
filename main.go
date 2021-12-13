@@ -1,21 +1,31 @@
 package main
 
 import (
+	"flag"
 	"gameoflife/api"
 	"gameoflife/model"
 	"gameoflife/websocket"
 	"net/http"
 )
 
-var size = 20 // could be input variable
+var (
+	addr = flag.String("addr", ":8080", "http service address")
+	size = flag.Int("size", 20, "world size")
+)
+
 
 func main() {
+	flag.Parse()
+	// websocket init
 	websocket.Init()
-	model.Init(size)
 	go websocket.CurrentHub.Run()
+	// init cells and cells controller
+	model.Init(*size)
+	// register api services
 	initAPI()
+	// api listener is watching cell controller's each step
 	go api.ListenForUpdate()
-	err := http.ListenAndServe(":8081", nil)
+	err := http.ListenAndServe(*addr, nil)
 	if err != nil {
 		panic(err)
 	}

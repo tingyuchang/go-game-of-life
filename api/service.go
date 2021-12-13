@@ -17,6 +17,7 @@ func ListenForUpdate() {
 	}
 }
 
+// broadcastUpdate send formatted message to websocket hub
 func broadcastUpdate() {
 	response := indexResponse{
 		Cells:   model.CurrentController.Cells,
@@ -26,6 +27,7 @@ func broadcastUpdate() {
 	websocket.CurrentHub.BroadcastMsg(data)
 }
 
+// randomColor returns a random color from pre-defined colors
 func randomColor() string {
 	colors := []string{model.CELL_COLOR_1, model.CELL_COLOR_2, model.CELL_COLOR_3, model.CELL_COLOR_4, model.CELL_COLOR_5, model.CELL_COLOR_6, model.CELL_COLOR_7, model.CELL_COLOR_8, model.CELL_COLOR_9, model.CELL_COLOR_10, model.CELL_COLOR_11, model.CELL_COLOR_12, model.CELL_COLOR_13, model.CELL_COLOR_14, model.CELL_COLOR_15}
 
