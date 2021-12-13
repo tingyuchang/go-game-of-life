@@ -1,21 +1,21 @@
 package websocket
 
-
 import (
-	ws "github.com/gorilla/websocket"
 	"log"
 	"net/http"
 	"time"
+
+	ws "github.com/gorilla/websocket"
 )
 
 type WSClient struct {
-	hub *Hub
+	hub  *Hub
 	conn *ws.Conn
 	send chan []byte
 }
 
 var updrader = ws.Upgrader{
-	ReadBufferSize: 1024,
+	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
 	CheckOrigin: func(r *http.Request) bool {
 		// check client is valid origin or not, currently do nothing
@@ -23,13 +23,15 @@ var updrader = ws.Upgrader{
 	},
 }
 
-var newline = []byte{'\n'} // []byte("\n")
-var space = []byte{' '} // []byte(" 00")
+var (
+	newline = []byte{'\n'} // []byte("\n")
+	space   = []byte{' '}  // []byte(" 00")
+)
 
 // read message from websocket connection peer and push to hub broadcast
 // encapsulation message to struct Message includes wsclient info, thus
 // hub could identify which client sent message, and not send duplicate message to the client.
-func (c *WSClient) read()  {
+func (c *WSClient) read() {
 	defer func() {
 		c.hub.unRegister <- c
 		_ = c.conn.Close()
@@ -58,14 +60,13 @@ func (c *WSClient) read()  {
 }
 
 // write message to client
-func (c *WSClient) write()  {
+func (c *WSClient) write() {
 	ticker := time.NewTicker(pingPeriod)
 
-	for  {
+	for {
 		select {
-		case message, ok := <- c.send:
+		case message, ok := <-c.send:
 			if !ok {
-
 			}
 			w, err := c.conn.NextWriter(ws.TextMessage)
 			if err != nil {
@@ -79,20 +80,18 @@ func (c *WSClient) write()  {
 			n := len(c.send)
 			for i := 0; i < n; i++ {
 				_, _ = w.Write(newline)
-				_, _ = w.Write(<- c.send)
+				_, _ = w.Write(<-c.send)
 			}
 			if err = w.Close(); err != nil {
 				return
 			}
-		case <- ticker.C:
+		case <-ticker.C:
 
 		}
-
 	}
 }
 
-
-func ServeWS(w http.ResponseWriter, r *http.Request, h *Hub)  {
+func ServeWS(w http.ResponseWriter, r *http.Request, h *Hub) {
 	conn, err := updrader.Upgrade(w, r, nil)
 	if err != nil {
 		return
@@ -100,7 +99,7 @@ func ServeWS(w http.ResponseWriter, r *http.Request, h *Hub)  {
 
 	client := &WSClient{
 		conn: conn,
-		hub: h,
+		hub:  h,
 		send: make(chan []byte, 256),
 	}
 

@@ -2,5 +2,5 @@ package websocket
 
 type Message struct {
 	Sender *WSClient
-	Msg []byte
+	Msg    []byte
 }

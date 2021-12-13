@@ -1,8 +1,5 @@
 package websocket
 
-
-
-
 type Hub struct {
 	// store clients
 	clients map[*WSClient]bool
@@ -14,32 +11,32 @@ type Hub struct {
 	unRegister chan *WSClient
 }
 
-func NewHub()*Hub {
+func NewHub() *Hub {
 	return &Hub{
-		clients: make(map[*WSClient]bool),
-		broadcast: make(chan Message),
-		register: make(chan *WSClient),
+		clients:    make(map[*WSClient]bool),
+		broadcast:  make(chan Message),
+		register:   make(chan *WSClient),
 		unRegister: make(chan *WSClient),
 	}
 }
 
-func Init()  {
+func Init() {
 	CurrentHub = NewHub()
 }
 
-func (h *Hub) Run()  {
-	for  {
+func (h *Hub) Run() {
+	for {
 		select {
 		// register client
-		case client := <- h.register:
+		case client := <-h.register:
 			h.clients[client] = true
 		// unregister client
-		case client := <- h.unRegister:
+		case client := <-h.unRegister:
 			if _, ok := h.clients[client]; ok {
 				delete(h.clients, client)
 				close(client.send)
 			}
-		case message := <- h.broadcast:
+		case message := <-h.broadcast:
 			for client := range h.clients {
 				// skip duplicate message
 				if message.Sender != client {
@@ -50,9 +47,7 @@ func (h *Hub) Run()  {
 						close(client.send)
 					}
 				}
-
 			}
 		}
-
 	}
 }

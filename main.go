@@ -7,9 +7,7 @@ import (
 	"net/http"
 )
 
-var (
-	size = 20 // could be input variable
-)
+var size = 20 // could be input variable
 
 func main() {
 	model.CurrentController = model.GetStartWithGlider(size)
@@ -29,4 +27,3 @@ func main() {
 		panic(err)
 	}
 }
-

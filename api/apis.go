@@ -16,7 +16,7 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Access-Control-Allow-Headers", "Origin, Methods, Content-Type, Authorization")
 		w.Header().Add("Access-Control-Allow-Credentials", "true")
 		response := indexResponse{
-			Cells: model.CurrentController.Cells,
+			Cells:   model.CurrentController.Cells,
 			IsStart: model.CurrentController.IsStart,
 		}
 		data, _ := json.Marshal(response)

@@ -12,7 +12,6 @@ type response struct {
 }
 
 type indexResponse struct {
-	Cells []*model.Cell `json:"cells"`
-	IsStart bool `json:"is_start"`
+	Cells   []*model.Cell `json:"cells"`
+	IsStart bool          `json:"is_start"`
 }
-
