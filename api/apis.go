@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"gameoflife/model"
+	"gameoflife/websocket"
 	"net/http"
 )
 
@@ -26,6 +27,7 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func WsUpgradeHandler(w http.ResponseWriter, r *http.Request) {
+	websocket.ServeWS(w, r, websocket.CurrentHub)
 }
 
 func StartHandler(w http.ResponseWriter, r *http.Request) {
