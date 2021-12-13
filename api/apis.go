@@ -72,7 +72,7 @@ func ReverseHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			http.Error(w, "Params are invalid", http.StatusBadRequest)
 		}
-		model.CurrentController.Reverse(p.Id)
+		model.CurrentController.Reverse(p.Id, p.Color)
 		data, _ := json.Marshal(response{Success: true})
 		_, _ = w.Write(data)
 	} else {
@@ -104,6 +104,23 @@ func ResetHandler(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Access-Control-Allow-Credentials", "true")
 		model.CurrentController.Reset()
 		data, _ := json.Marshal(response{Success: true})
+		_, _ = w.Write(data)
+	} else {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+	}
+}
+
+func GetColorHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		w.Header().Add("Content-Type", "application/json")
+		w.Header().Add("Access-Control-Allow-Origin", "*")
+		w.Header().Add("Access-Control-Allow-Methods", "*")
+		w.Header().Add("Access-Control-Allow-Headers", "Origin, Methods, Content-Type, Authorization")
+		w.Header().Add("Access-Control-Allow-Credentials", "true")
+		response := colorResponse{
+			Color: randomColor(),
+		}
+		data, _ := json.Marshal(response)
 		_, _ = w.Write(data)
 	} else {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)

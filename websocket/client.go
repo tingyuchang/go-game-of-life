@@ -59,8 +59,9 @@ func (c *WSClient) read() {
 			fmt.Println(msg)
 			continue
 		}
-		clientMsg := Message{Sender: c, Msg: message}
-		c.hub.broadcast <- clientMsg
+		// no need to share message from peer to peer
+		// clientMsg := Message{Sender: c, Msg: message}
+		// c.hub.broadcast <- clientMsg
 	}
 }
 

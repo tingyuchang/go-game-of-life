@@ -29,4 +29,5 @@ func initAPI() {
 	http.Handle("/reverse", http.HandlerFunc(api.ReverseHandler))
 	http.Handle("/next", http.HandlerFunc(api.NextHandler))
 	http.Handle("/reset", http.HandlerFunc(api.ResetHandler))
+	http.Handle("/color", http.HandlerFunc(api.GetColorHandler))
 }

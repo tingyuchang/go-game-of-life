@@ -47,8 +47,15 @@ func (c *Controller) Show() {
 }
 
 // Reverse reverse cell's status
-func (c *Controller) Reverse(position int) {
+func (c *Controller) Reverse(position int, color string) {
 	c.Cells[position].Status = !c.Cells[position].Status
+	if c.Cells[position].Status == CELL_LIVE {
+		if len(color) > 0 {
+			c.Cells[position].Color = color
+		} else {
+			c.Cells[position].Color = CELL_COLOR_1
+		}
+	}
 	c.Step <- struct{}{}
 }
 
@@ -126,11 +133,11 @@ func GetStartWithGlider(size int) *Controller {
 	}
 
 	center := (size/2-1)*size + (size/2 - 1)
-	controller.Cells[center - size].Status = CELL_LIVE
-	controller.Cells[center + 1].Status = CELL_LIVE
-	controller.Cells[center + size - 1].Status = CELL_LIVE
-	controller.Cells[center + size].Status = CELL_LIVE
-	controller.Cells[center + size + 1].Status = CELL_LIVE
+	controller.Cells[center-size].Status = CELL_LIVE
+	controller.Cells[center+1].Status = CELL_LIVE
+	controller.Cells[center+size-1].Status = CELL_LIVE
+	controller.Cells[center+size].Status = CELL_LIVE
+	controller.Cells[center+size+1].Status = CELL_LIVE
 
 	return controller
 }

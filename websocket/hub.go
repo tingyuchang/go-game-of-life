@@ -52,7 +52,7 @@ func (h *Hub) Run() {
 	}
 }
 
-func (h *Hub) BroadcastMsg(msg []byte)  {
+func (h *Hub) BroadcastMsg(msg []byte) {
 	serverMessage := Message{Sender: nil, Msg: msg}
 	h.broadcast <- serverMessage
 }
