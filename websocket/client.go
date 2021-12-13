@@ -1,6 +1,7 @@
 package websocket
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -53,6 +54,10 @@ func (c *WSClient) read() {
 				log.Printf("error: %v", err)
 			}
 			break
+		}
+		if msg := string(message[:]); msg == "hi" {
+			fmt.Println(msg)
+			continue
 		}
 		clientMsg := Message{Sender: c, Msg: message}
 		c.hub.broadcast <- clientMsg

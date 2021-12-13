@@ -13,6 +13,7 @@ type Controller struct {
 	ctx     context.Context
 	cancel  context.CancelFunc
 	IsStart bool
+	Step    chan struct{}
 }
 
 // Run execute cell.CheckLife() for all cells
@@ -59,6 +60,7 @@ func (c *Controller) Start(ctx context.Context) {
 	c.IsStart = true
 	for {
 		c.Run()
+		c.Step <- struct{}{}
 		time.Sleep(1 * time.Second)
 		select {
 		case <-c.ctx.Done():
@@ -104,7 +106,8 @@ func (c *Controller) Reset() {
 // and setup cell's neighbors.
 func NewController(size int) *Controller {
 	cells := initCells(size)
-	return &Controller{Cells: cells, Size: size}
+	step := make(chan struct{})
+	return &Controller{Cells: cells, Size: size, Step: step}
 }
 
 // GetStartWithGlider initialize graph like glider on the center

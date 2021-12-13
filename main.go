@@ -14,6 +14,7 @@ func main() {
 	model.Init(size)
 	go websocket.CurrentHub.Run()
 	initAPI()
+	go api.ListenForUpdate()
 	err := http.ListenAndServe(":8081", nil)
 	if err != nil {
 		panic(err)
