@@ -11,11 +11,8 @@ import (
 // TODO: stop channel receiver, and improve performance
 func ListenForUpdate() {
 	for {
-		select {
-		case <- model.CurrentController.Step:
-			broadcastUpdate()
-		default:
-		}
+		<- model.CurrentController.Step
+		broadcastUpdate()
 	}
 }
 

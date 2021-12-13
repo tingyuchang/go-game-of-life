@@ -49,6 +49,7 @@ func (c *Controller) Show() {
 // Reverse reverse cell's status
 func (c *Controller) Reverse(position int) {
 	c.Cells[position].Status = !c.Cells[position].Status
+	c.Step <- struct{}{}
 }
 
 // Start starts infinite loop to run c.Run() per second
@@ -88,6 +89,7 @@ func (c *Controller) Next() {
 		c.Start(context.Background())
 	} else {
 		c.Run()
+		c.Step <- struct{}{}
 	}
 }
 
@@ -100,6 +102,7 @@ func (c *Controller) Reset() {
 	c.Cells = initCells(c.Size)
 	c.Version = 0
 	c.IsStart = false
+	c.Step <- struct{}{}
 }
 
 // NewController create a controller which initialize size*size cells
@@ -123,11 +126,11 @@ func GetStartWithGlider(size int) *Controller {
 	}
 
 	center := (size/2-1)*size + (size/2 - 1)
-	controller.Reverse(center - size)
-	controller.Reverse(center + 1)
-	controller.Reverse(center + size - 1)
-	controller.Reverse(center + size)
-	controller.Reverse(center + size + 1)
+	controller.Cells[center - size].Status = CELL_LIVE
+	controller.Cells[center + 1].Status = CELL_LIVE
+	controller.Cells[center + size - 1].Status = CELL_LIVE
+	controller.Cells[center + size].Status = CELL_LIVE
+	controller.Cells[center + size + 1].Status = CELL_LIVE
 
 	return controller
 }
