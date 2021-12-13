@@ -14,7 +14,11 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Access-Control-Allow-Methods", "*")
 		w.Header().Add("Access-Control-Allow-Headers", "Origin, Methods, Content-Type, Authorization")
 		w.Header().Add("Access-Control-Allow-Credentials", "true")
-		data, _ := json.Marshal(model.CurrentController.Cells)
+		response := indexResponse{
+			Cells: model.CurrentController.Cells,
+			IsStart: model.CurrentController.IsStart,
+		}
+		data, _ := json.Marshal(response)
 		_, _ = w.Write(data)
 	} else {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)

@@ -12,6 +12,7 @@ type Controller struct {
 	Version int
 	ctx     context.Context
 	cancel  context.CancelFunc
+	IsStart bool
 }
 
 // Run execute cell.CheckLife() for all cells
@@ -51,10 +52,11 @@ func (c *Controller) Reverse(position int) {
 
 // Start starts infinite loop to run c.Run() per second
 func (c *Controller) Start(ctx context.Context) {
-	if c.cancel != nil {
+	if c.IsStart {
 		return
 	}
 	c.ctx, c.cancel = context.WithCancel(ctx)
+	c.IsStart = true
 	for {
 		c.Run()
 		c.Show()
@@ -71,13 +73,15 @@ func (c *Controller) Start(ctx context.Context) {
 func (c *Controller) Stop() {
 	if c.cancel != nil {
 		c.cancel()
+		c.cancel = nil
+		c.IsStart = false
 	}
 }
 
 // Next likes Run(), but if controller is running
 // should stop current loop and run new loop after Run()
 func (c *Controller) Next() {
-	if c.cancel != nil {
+	if c.IsStart {
 		c.Stop()
 		c.Run()
 		c.Start(context.Background())
@@ -168,7 +172,7 @@ func GetStartWithGlider(size int) *Controller {
 }
 
 func ResetController(c *Controller) *Controller {
-	if c.cancel != nil {
+	if c.IsStart {
 		c.Stop()
 	}
 	reset := NewController(c.Size)
