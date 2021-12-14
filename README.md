@@ -7,6 +7,14 @@
 3. Any live cell with more than three live neighbors dies, as if by overcrowding.
 4. Any dead cell with exactly three live neighbors becomes a live cell, as if by reproduction.
 
+For this repository
+
+1. Implement the Game of Life browser frontend. You can use any representation such as `canvas`, simple DOM manipulation or even `table` cells. The game should tick automatically at a predefined interval, at say, 1 step per second.
+2. The browser connects to a server, which allows multiple browsers to share the same, synchronized world view. Unless otherwise specified, the server may be written in Ruby, Node.js, or any other technology supported by Heroku. You may use any framework, e.g. Ruby on Rails, Hapi, Phoenix or just plain listening on a socket.
+3. Each client is assigned a random color on initialization. From the browser, clicking on any grid will create a live cell on that grid with the client’s color. This change should be synchronized across all connected clients. (You can use any mechanism to achieve this, such as polling, comet, or WebSocket.)
+4. When a dead cell revives by rule #4 “Any dead cell with exactly three live neighbors becomes a live cell, as if by reproduction.”, it will be given a color that is the average of its neighbors (that revive it).
+5. To make the evolution more interesting, include a toolbar that places some predefined patterns at random places with the player’s color, such as those found at here https://en.wikipedia.org/wiki/Conway’s_Game_of_Life#Examples_of_patterns (not necessary to implement all, just 3 - 4 is fine).
+
 
 This is a backend service for game of life, include managing cells life cycle, providing RESTful APIs, and Websocket server.
 
@@ -22,7 +30,8 @@ type Cell struct {
 }
 ```
 
-cell keeps pointer of neighbors, when enter the evaluate stage, it would be easy to calculate the number of living neighbors.
+Cell keeps pointer of neighbors, when enter the evaluate stage, it would be easy to calculate the number of living neighbors.
+For #4 requirement, it's also easy determine average color from neighbors.
 
 ```
 type Controller struct {
@@ -41,10 +50,17 @@ controller responses for managing 2 stages of cell's lifecycle:
 1. evaluate: evaluating cell will live or die. 
 2. refresh: changing cell's status to live or die.
 
+Actually, controller handle all behavior in this solution, like:
+1. start auto-step
+2. stop auto-stop
+3. jump into next step
+4. reset all cells
+5. revive or make cell die
+
 
 ### Web API
 
-RESTful api provide start, stop, next, reset, reverse and get cells methods to client.
+RESTful api provide start, stop, next, reset, reverse and get cells methods to client to control controller.
 
 ### Websocket
 we use websocket to notify client to get update of cell's status, thus, client could not setting timer to fetch result, and easy to share other clients reverse action. 
@@ -82,13 +98,16 @@ heroku open
 ```
 
 ## Discussion
-Q: If the client disconnects and reconnects some time in the future, do they need to keep the same color?
+**Q: If the client disconnects and reconnects some time in the future, do they need to keep the same color?**
 
 Current solution reassign random color when client reload the page.
 If we want to keep the same color, there are 2 ways to achieve:
 1. server keeps client's identify info, when the client ask a random color, we can make sure give a same color.
 2. client keeps color in local storage
 
+**Q: every single update sends all cells info, can we just get updated cells?**
+
+it seems good for transfer efficiency, but current process is push base, server is hard to know client's status (or version), if change to pull base, client would `pull` much more requests than push base and server need to handle version diff for each request, i don't think this way is more efficiency. BUT maybe i'm wrong, welcome to discuss.
 ## Reference 
 - https://github.com/gorilla/websocket
   
