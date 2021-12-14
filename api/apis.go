@@ -146,3 +146,29 @@ func GetColorHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	}
 }
+
+// SetPatternHandler set predefine pattern to broad
+func SetPatternHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		// to resolve CORS issue when local testing
+		w.Header().Add("Content-Type", "application/json")
+		w.Header().Add("Access-Control-Allow-Origin", "*")
+		w.Header().Add("Access-Control-Allow-Methods", "*")
+		w.Header().Add("Access-Control-Allow-Headers", "Origin, Methods, Content-Type, Authorization")
+		w.Header().Add("Access-Control-Allow-Credentials", "true")
+		var p patternParams
+		err := json.NewDecoder(r.Body).Decode(&p)
+		if err != nil {
+			http.Error(w, "Params are invalid", http.StatusBadRequest)
+		}
+		model.SetToPatterns(p.Pattern, model.CurrentController.Size)
+		response := indexResponse{
+			Cells:   model.CurrentController.Cells,
+			IsStart: model.CurrentController.IsStart,
+		}
+		data, _ := json.Marshal(response)
+		_, _ = w.Write(data)
+	} else {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+	}
+}

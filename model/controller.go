@@ -119,33 +119,11 @@ func NewController(size int) *Controller {
 	step := make(chan struct{})
 	return &Controller{Cells: cells, Size: size, Step: step}
 }
-
-// GetStartWithGlider initialize graph like glider on the center
-// ex:
-//	X O X
-//	X X O
-//	O O O
-//
-func GetStartWithGlider(size int) *Controller {
-	controller := NewController(size)
-	if size < 10 {
-		return controller
-	}
-
-	center := (size/2-1)*size + (size/2 - 1)
-	controller.Cells[center-size].Status = CELL_LIVE
-	controller.Cells[center+1].Status = CELL_LIVE
-	controller.Cells[center+size-1].Status = CELL_LIVE
-	controller.Cells[center+size].Status = CELL_LIVE
-	controller.Cells[center+size+1].Status = CELL_LIVE
-
-	return controller
-}
-
 // Init create controller with default shape
 // size is the cells count (equal size*size)
 func Init(size int) {
-	CurrentController = GetStartWithGlider(size)
+	CurrentController = NewController(size)
+	SetToPatterns(CELL_PATTERN_GLIDER, size)
 }
 
 // initCells create a new cells (all die)
@@ -203,4 +181,59 @@ func initCells(size int) []*Cell {
 		cell.SetNeighbors(neighbors)
 	}
 	return cells
+}
+
+// SetToPatterns accepts size to calculate center position
+// and put predefine special shape in the center.
+// TODO: refactoring to accept position, but need to validate over edge or not
+func SetToPatterns(pattern CellPattern, size int) {
+	if CurrentController.IsStart {
+		CurrentController.Stop()
+	}
+	selectedCell := make(map[int]bool)
+	center := (size/2-1)*size + (size/2 - 1)
+	switch pattern {
+	case CELL_PATTERN_GLIDER:
+		//	X O X
+		//	X X O
+		//	O O O
+		selectedCell[center-size] = true
+		selectedCell[center+1] = true
+		selectedCell[center+size-1] = true
+		selectedCell[center+size] = true
+		selectedCell[center+size+1] = true
+	case CELL_PATTERN_BEACON:
+		//	O O X X
+		//	O O X X
+		//	X X O O
+		//  X X O O
+		selectedCell[center-size*2-1] = true
+		selectedCell[center-size*2] = true
+		selectedCell[center-size-1] = true
+		selectedCell[center-size] = true
+		selectedCell[center+1] = true
+		selectedCell[center+2] = true
+		selectedCell[center+size+1] = true
+		selectedCell[center+size+2] = true
+
+	case CELL_PATTERN_BOAT:
+		//	O O X
+		//	O X O
+		//	X O X
+		selectedCell[center-size-1] = true
+		selectedCell[center-size] = true
+		selectedCell[center-1] = true
+		selectedCell[center+1] = true
+		selectedCell[center+size] = true
+	default:
+
+	}
+	for i, v := range CurrentController.Cells {
+		if selectedCell[i] == true {
+			v.Status = CELL_LIVE
+			v.Color = CELL_COLOR_1
+		} else {
+			v.Status = CELL_DIE
+		}
+	}
 }

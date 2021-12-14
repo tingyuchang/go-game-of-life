@@ -40,4 +40,5 @@ func initAPI() {
 	http.Handle("/next", http.HandlerFunc(api.NextHandler))
 	http.Handle("/reset", http.HandlerFunc(api.ResetHandler))
 	http.Handle("/color", http.HandlerFunc(api.GetColorHandler))
+	http.Handle("/pattern", http.HandlerFunc(api.SetPatternHandler))
 }

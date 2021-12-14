@@ -9,6 +9,10 @@ type reverseParams struct {
 	Color  string `json:"color"`
 }
 
+type patternParams struct {
+	Pattern     model.CellPattern    `json:"pattern"`
+}
+
 // Response for general usage
 type response struct {
 	Success bool `json:"success"`

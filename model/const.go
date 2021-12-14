@@ -40,3 +40,11 @@ const (
 	CELL_COLOR_14 = "#DFFF00"
 	CELL_COLOR_15 = "#9FE2BF"
 )
+
+type CellPattern int
+
+const  (
+	CELL_PATTERN_GLIDER CellPattern = 1
+	CELL_PATTERN_BEACON CellPattern = 2
+	CELL_PATTERN_BOAT CellPattern = 3
+)
