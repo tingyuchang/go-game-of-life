@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	addr = flag.String("addr", ":8080", "http service address")
+	addr = flag.String("addr", "8080", "http service address")
 	size = flag.Int("size", 20, "world size")
 )
 
@@ -25,7 +25,7 @@ func main() {
 	initAPI()
 	// api listener is watching cell controller's each step
 	go api.ListenForUpdate()
-	err := http.ListenAndServe(*addr, nil)
+	err := http.ListenAndServe(":"+*addr, nil)
 	if err != nil {
 		panic(err)
 	}

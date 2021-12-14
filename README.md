@@ -51,6 +51,10 @@ we use websocket to notify client to get update of cell's status, thus, client c
 
 ## How to test
 
+We provide a stdout method to easy check cells status 
+`model.Controller.Show()`
+
+For unit testing:
 ```
 go test -v ./...
 ```
@@ -58,10 +62,33 @@ go test -v ./...
 ## How to build 
 ```
 go build .
-./gameoflife -addr :8080 -size 20
-// addr is running address:port
+./gameoflife -addr 8080 -size 20
+// addr is running address
 // size is the cell size
 ```
 
 ## How to deploy
 
+### heroku
+We recommend using docker to deploy this app, it could be easy to transfer in different platforms.
+```
+// heroku cli
+heroku create
+heroku container:push web 
+// web is the name you can change it to anything you want
+heroku container:release web
+heroku ps:scale web=1
+heroku open
+```
+
+## Discussion
+Q: If the client disconnects and reconnects some time in the future, do they need to keep the same color?
+
+Current solution reassign random color when client reload the page.
+If we want to keep the same color, there are 2 ways to achieve:
+1. server keeps client's identify info, when the client ask a random color, we can make sure give a same color.
+2. client keeps color in local storage
+
+## Reference 
+- https://github.com/gorilla/websocket
+  
