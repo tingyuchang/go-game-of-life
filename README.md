@@ -22,6 +22,7 @@ This is a backend service for game of life, include managing cells life cycle, p
 ## Solution
 
 ### Controller & Cell
+
 ```
 type Cell struct {
 	Status     CellStatus 
@@ -51,6 +52,7 @@ controller responses for managing 2 stages of cell's lifecycle:
 2. refresh: changing cell's status to live or die.
 
 Actually, controller handle all behavior in this solution, like:
+
 1. start auto-step
 2. stop auto-stop
 3. jump into next step
@@ -76,6 +78,7 @@ go test -v ./...
 ```
 
 ## How to build 
+
 ```
 go build .
 ./gameoflife -addr 8080 -size 20
@@ -86,7 +89,9 @@ go build .
 ## How to deploy
 
 ### heroku
+
 We recommend using docker to deploy this app, it could be easy to transfer in different platforms.
+
 ```
 // heroku cli
 heroku create
@@ -98,16 +103,26 @@ heroku open
 ```
 
 ## Discussion
+
 **Q: If the client disconnects and reconnects some time in the future, do they need to keep the same color?**
 
 Current solution reassign random color when client reload the page.
 If we want to keep the same color, there are 2 ways to achieve:
+
 1. server keeps client's identify info, when the client ask a random color, we can make sure give a same color.
 2. client keeps color in local storage
 
 **Q: every single update sends all cells info, can we just get updated cells?**
 
 it seems good for transfer efficiency, but current process is push base, server is hard to know client's status (or version), if change to pull base, client would `pull` much more requests than push base and server need to handle version diff for each request, i don't think this way is more efficiency. BUT maybe i'm wrong, welcome to discuss.
+
+**How to scale?**
+We can't horizontal scale currently solution, only vertical scaling, because we keeps data in memory, thus if multiple instances exist, each server has own cells, that is not we want. To achieve horizontal scaling, these are 2 ways:
+
+1. separating package model from api & websocket to a single service, when users grow, connections use to be a bottleneck, api & websocket could scale horizontal.
+2. Do not keep data in RAM, use Redis instead.
+
 ## Reference 
+
 - https://github.com/gorilla/websocket
   
