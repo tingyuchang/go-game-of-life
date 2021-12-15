@@ -18,6 +18,12 @@ For this repository
 
 This is a backend service for game of life, include managing cells life cycle, providing RESTful APIs, and Websocket server.
 
+### Demo
+[demo site](https://afternoon-fjord-92266.herokuapp.com/)
+[frontend repo](https://github.com/tingyuchang/vue-game-of-life)
+
+![Imgur](https://imgur.com/SwC0P2u.gif)
+
 
 ## Solution
 
@@ -117,6 +123,7 @@ If we want to keep the same color, there are 2 ways to achieve:
 it seems good for transfer efficiency, but current process is push base, server is hard to know client's status (or version), if change to pull base, client would `pull` much more requests than push base and server need to handle version diff for each request, i don't think this way is more efficiency. BUT maybe i'm wrong, welcome to discuss.
 
 **How to scale?**
+
 We can't horizontal scale currently solution, only vertical scaling, because we keeps data in memory, thus if multiple instances exist, each server has own cells, that is not we want. To achieve horizontal scaling, these are 2 ways:
 
 1. separating package model from api & websocket to a single service, when users grow, connections use to be a bottleneck, api & websocket could scale horizontal.
